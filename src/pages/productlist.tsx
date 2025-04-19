@@ -1,103 +1,8 @@
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import {
-//   Card,
-//   CardContent,
-//   Typography,
-//   Grid,
-//   Button,
-//   CardMedia,
-// } from "@mui/material";
-
-// interface Product {
-//   _id: string;
-//   name: string;
-//   description: string;
-//   price: number;
-//   stock: number;
-//   images: string[];
-//   createdAt: string;
-// }
-
-// const ProductList: React.FC = () => {
-//   const [products, setProducts] = useState<Product[]>([]);
-//   const token = localStorage.getItem("token");
-
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []);
-
-//   const fetchProducts = async () => {
-//     try {
-//       const res = await axios.get("http://localhost:5000/api/products", {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       setProducts(res.data);
-//     } catch (error) {
-//       console.error("Failed to fetch products:", error);
-//     }
-//   };
-
-//   const deleteProduct = async (id: string) => {
-//     try {
-//       await axios.delete(`http://localhost:5000/api/products/${id}`, {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       });
-//       setProducts(products.filter((product) => product._id !== id));
-//     } catch (error) {
-//       console.error("Error deleting product:", error);
-//     }
-//   };
-
-//   return (
-//     <Grid container spacing={2} padding={2}>
-//       {products.map((product) => (
-//         // <Grid item xs={12} sm={6} md={4} key={product._id}>
-//           <Card>
-//             {product.images.length > 0 && (
-//               <CardMedia
-//                 component="img"
-//                 height="200"
-//                 image={`http://localhost:5000/uploads/${product.images[0]}`}
-//                 alt={product.name}
-//               />
-//             )}
-//             <CardContent>
-//               <Typography variant="h6">{product.name}</Typography>
-//               <Typography variant="body2" color="textSecondary">
-//                 {product.description}
-//               </Typography>
-
-//               <Typography>Price: ₹{product.price}</Typography>
-//               <Typography>Stock: {product.stock}</Typography>
-//               <Typography variant="caption" display="block" gutterBottom>
-//                 Created At: {new Date(product.createdAt).toLocaleString()}
-//               </Typography>
-//               <Button
-//                 variant="contained"
-//                 color="success"
-//                 onClick={() => deleteProduct(product._id)}
-//                 style={{ marginTop: "10px" }}
-//               >
-//                 Delete the Product..
-//               </Button>
-//             </CardContent>
-//           </Card>
-//         // </Grid>
-//       ))}
-//     </Grid>
-//   );
-// };
-
-// export default ProductList;
-
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+
 import {
   Card,
   CardContent,
@@ -123,7 +28,9 @@ interface Product {
   createdAt: string;
 }
 
+
 const ProductList: React.FC = () => {
+    const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
@@ -160,6 +67,7 @@ const ProductList: React.FC = () => {
         },
       });
       setProducts(products.filter((product) => product._id !== id));
+      alert("Product deleted successfully");
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -201,7 +109,8 @@ const ProductList: React.FC = () => {
   };
 
   return (
-    <Box p={2}>
+      <Box p={2}>
+        <h1> Products Fetching</h1>
       {/* Filters */}
       <Box display="flex" gap={2} mb={3} flexWrap="wrap">
         <TextField
@@ -209,7 +118,7 @@ const ProductList: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        
+
         <FormControl sx={{ minWidth: 150 }}>
           <InputLabel>Stock</InputLabel>
           <Select
@@ -239,6 +148,14 @@ const ProductList: React.FC = () => {
         </FormControl>
       </Box>
 
+            {/* <Button variant="contained"
+              color="success"
+              onClick={() => navigate('/products/create')}
+              sx={{ mt: 1 }}
+              >
+                Create the Products!
+            </Button> */}
+
       {/* Product Grid */}
       <Grid container spacing={2}>
         {filteredProducts.map((product) => (
@@ -263,11 +180,15 @@ const ProductList: React.FC = () => {
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => deleteProduct(product._id)}
+                  onClick={() => deleteProduct(product._id) }
+                  // eslint-disable-next-line react/jsx-no-duplicate-props
+               
                   sx={{ mt: 1 }}
-                >
-                  Delete
+                  
+                  >
+                  Delete 
                 </Button>
+
               </CardContent>
             </Card>
         //   </Grid>
