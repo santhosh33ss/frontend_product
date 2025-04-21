@@ -1,13 +1,13 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/login';
-import Register from './pages/register';
 import { Container, Box, Typography } from '@mui/material';
+import { Provider } from 'react-redux';
 import ProductList from './pages/productlist';
 import ProductCreate from './pages/productcreate';
 import EditProduct from './pages/productedit';
-import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import Login from './pages/login';
+import Register from './pages/register';
 
 const App: React.FC = () => {
   return (

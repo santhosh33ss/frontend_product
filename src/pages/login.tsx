@@ -28,6 +28,7 @@ const Login: React.FC = () => {
     dispatch(loginUser({ email, password }));
   };
 
+
   useEffect(() => {
     if (success) {
       alert('Login successful');
@@ -46,22 +47,26 @@ const Login: React.FC = () => {
 
       <TextField
         label="Email"
+        name="email"
         fullWidth
         margin="normal"
         value={email}
+        inputProps={{ 'data-testid': 'email-input' }}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <TextField
         label="Password"
+        name="password"
         type="password"
         fullWidth
         margin="normal"
         value={password}
+        inputProps={{ 'data-testid': 'password-input' }}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-
+      
       <Button
         type="submit"
         variant="contained"

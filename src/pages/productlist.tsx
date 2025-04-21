@@ -1,14 +1,6 @@
 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../redux/store";
-import {
-  fetchProducts,
-  deleteProduct,
-  setSearch,
-  setSortOption,
-  setStockFilter,
-} from "../features/products/productSlice";
 import {
   Box,
   Button,
@@ -28,6 +20,14 @@ import {
   Paper,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { RootState, AppDispatch } from "../redux/store";
+import {
+  fetchProducts,
+  deleteProduct,
+  setSearch,
+  setSortOption,
+  setStockFilter,
+} from "../features/products/productSlice";
 
 const ProductList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

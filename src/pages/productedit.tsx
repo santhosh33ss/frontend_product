@@ -29,12 +29,12 @@ const EditProduct: React.FC = () => {
         console.error("Error fetching product", err);
         setLoading(false);
       });
-  }, [id]);
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
-  
+
   const handleUpdate = () => {
     axios
       .put(`http://localhost:5000/api/products/${id}`, product, {

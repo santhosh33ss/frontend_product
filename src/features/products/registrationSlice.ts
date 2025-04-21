@@ -1,5 +1,7 @@
 // src/redux/slices/authSlice.ts
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, 
+    // PayloadAction 
+} from '@reduxjs/toolkit';
 
 interface RegisterPayload {
   name: string;
