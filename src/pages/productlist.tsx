@@ -1,130 +1,74 @@
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from 'react-router-dom';
-
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "../redux/store";
 import {
-  Card,
-  CardContent,
-  Typography,
-  Grid,
+  fetchProducts,
+  deleteProduct,
+  setSearch,
+  setSortOption,
+  setStockFilter,
+} from "../features/products/productSlice";
+import {
+  Box,
   Button,
-  CardMedia,
-  TextField,
-  MenuItem,
-  Select,
   FormControl,
   InputLabel,
-  Box,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  Paper,
 } from "@mui/material";
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  images: string[];
-  createdAt: string;
-}
-
+import { useNavigate } from "react-router-dom";
 
 const ProductList: React.FC = () => {
-    const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [search, setSearch] = useState("");
-  const [stockFilter, setStockFilter] = useState("");
-  const [sortOption, setSortOption] = useState("");
-  const token = localStorage.getItem("token");
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { filteredProducts, search, stockFilter, sortOption } = useSelector(
+    (state: RootState) => state.product
+  );
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    applyFilters();
-  }, [search, stockFilter, sortOption, products]);
-
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };
-
-  const deleteProduct = async (id: string) => {
-    try {
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProducts(products.filter((product) => product._id !== id));
-      alert("Product deleted successfully");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...products];
-
-    // Filter by name
-    if (search) {
-      filtered = filtered.filter((product) =>
-        product.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    // Filter by stock
-    if (stockFilter === "inStock") {
-      filtered = filtered.filter((product) => product.stock > 0);
-    } else if (stockFilter === "outOfStock") {
-      filtered = filtered.filter((product) => product.stock <= 0);
-    }
-
-    // Sort
-    if (sortOption === "newest") {
-      filtered.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    } else if (sortOption === "oldest") {
-      filtered.sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-    } else if (sortOption === "priceLowHigh") {
-      filtered.sort((a, b) => a.price - b.price);
-    } else if (sortOption === "priceHighLow") {
-      filtered.sort((a, b) => b.price - a.price);
-    }
-
-    setFilteredProducts(filtered);
-  };
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   return (
-      <Box p={2}>
-        <h1> Products Fetching</h1>
-      {/* Filters */}
+    <Box p={2}>
+      <Button
+        variant="contained"
+        color="success"
+        onClick={() => navigate("/products/create")}
+        sx={{ mt: 1, mb: 2 }}
+      >
+        CREATE PRODUCT
+      </Button>
+
+      <Typography variant="h5" mb={2}>
+        PRODUCT LISTS
+      </Typography>
+
       <Box display="flex" gap={2} mb={3} flexWrap="wrap">
         <TextField
           label="Search by name"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => dispatch(setSearch(e.target.value))}
         />
-
         <FormControl sx={{ minWidth: 150 }}>
           <InputLabel>Stock</InputLabel>
           <Select
             value={stockFilter}
             label="Stock"
-            onChange={(e) => setStockFilter(e.target.value)}
+            onChange={(e: SelectChangeEvent) =>
+              dispatch(setStockFilter(e.target.value))
+            }
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="inStock">In Stock</MenuItem>
@@ -137,63 +81,75 @@ const ProductList: React.FC = () => {
           <Select
             value={sortOption}
             label="Sort"
-            onChange={(e) => setSortOption(e.target.value)}
+            onChange={(e: SelectChangeEvent) =>
+              dispatch(setSortOption(e.target.value))
+            }
           >
             <MenuItem value="">None</MenuItem>
             <MenuItem value="newest">Newest First</MenuItem>
             <MenuItem value="oldest">Oldest First</MenuItem>
-            {/* <MenuItem value="priceLowHigh">Price: Low to High</MenuItem>
-            <MenuItem value="priceHighLow">Price: High to Low</MenuItem> */}
+            <MenuItem value="priceLowHigh">Price Low to High</MenuItem>
+            <MenuItem value="priceHighLow">Price High to Low</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-            {/* <Button variant="contained"
-              color="success"
-              onClick={() => navigate('/products/create')}
-              sx={{ mt: 1 }}
-              >
-                Create the Products!
-            </Button> */}
-
-      {/* Product Grid */}
-      <Grid container spacing={2}>
-        {filteredProducts.map((product) => (
-        //   <Grid item xs={12} sm={6} md={4} key={product._id}>
-            <Card>
-              {product.images.length > 0 && (
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={`http://localhost:5000/uploads/${product.images[0]}`}
-                  alt={product.name}
-                />
-              )}
-              <CardContent>
-                <Typography variant="h6">{product.name}</Typography>
-                <Typography>{product.description}</Typography>
-                <Typography>₹{product.price}</Typography>
-                <Typography>Stock: {product.stock}</Typography>
-                <Typography variant="caption">
-                  {new Date(product.createdAt).toLocaleString()}
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => deleteProduct(product._id) }
-                  // eslint-disable-next-line react/jsx-no-duplicate-props
-               
-                  sx={{ mt: 1 }}
-                  
-                  >
-                  Delete 
-                </Button>
-
-              </CardContent>
-            </Card>
-        //   </Grid>
-        ))}
-      </Grid>
+      <Box sx={{ width: "140%", margin: "0 auto" }}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Image</TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Description</TableCell>
+                <TableCell>Price</TableCell>
+                <TableCell>Stock</TableCell>
+                <TableCell>Created At</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredProducts.map((product) => (
+                <TableRow key={product._id}>
+                  <TableCell>
+                    {product.images.length > 0 && (
+                      <img
+                        src={`http://localhost:5000/uploads/${product.images[0]}`}
+                        alt={product.name}
+                        style={{ width: 80, height: 80, objectFit: "cover" }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>₹{product.price}</TableCell>
+                  <TableCell>{product.stock}</TableCell>
+                  <TableCell>
+                    {new Date(product.createdAt).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => navigate(`/products/edit/${product._id}`)}
+                      sx={{ mr: 1 }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => dispatch(deleteProduct(product._id))}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 };

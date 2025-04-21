@@ -1,6 +1,7 @@
 // src/pages/CreateProduct.tsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreateProduct: React.FC = () => {
   const [product, setProduct] = useState({
@@ -10,6 +11,7 @@ const CreateProduct: React.FC = () => {
     stock: '',
   });
 
+  const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
 
   const handleChange = (
@@ -51,6 +53,7 @@ const CreateProduct: React.FC = () => {
 
       console.log(res.data);
       alert('Product created successfully!');
+      navigate('/products');
     } catch (err) {
       console.error(err);
       alert('Error creating product.');
@@ -112,17 +115,17 @@ const CreateProduct: React.FC = () => {
             accept="image/*"
             onChange={handleImageChange}
           />
-          {/* <div style={{ marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap' }}> */}
-            {/* {imagePreviews.map((src, index) => ( */}
-              {/* <img
+          {/* <div style={{ marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {imagePreviews.map((src, index) => (
+              <img
                 key={index}
                 src={src}
                 alt={`preview-${index}`}
-                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 5 }} */}
-              {/* /> */}
-            {/* ) */}
-            {/* )} */}
-          {/* </div> */}
+                style={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 5 }}
+              />
+            )
+            )}
+          </div> */}
         </div>
         <button
         type="submit"

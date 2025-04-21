@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
 import {
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert
+  Container, Typography, TextField, Button, Box, Alert
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser, resetAuthState } from '../features/products/registrationSlice';
+import { RootState, AppDispatch } from '../redux/store';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -18,8 +18,15 @@ const Register: React.FC = () => {
     password: ''
   });
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const { loading, error, success } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (success) {
+      alert('Registration successful!');
+      dispatch(resetAuthState());
+      setTimeout(() => navigate('/'), 1500);
+    }
+  }, [success, navigate, dispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -28,32 +35,9 @@ const Register: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    try {
-      const res = await fetch('http://localhost:5000/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        setError(errorData.message || 'Registration failed');
-        return;
-      }
-    //   setSuccess('Registration successful! Redirecting to login...');
-    alert('Registration successful! ');
-      setTimeout(() => navigate('/'), 2000);
-    } catch (err) {
-      console.error(err);
-      setError('Something went wrong. Please try again later.');
-    }
+    dispatch(registerUser(formData));
   };
 
   return (
@@ -63,7 +47,7 @@ const Register: React.FC = () => {
           Register
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">{success}</Alert>}
+        {success && <Alert severity="success">Registration successful!</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
@@ -87,16 +71,17 @@ const Register: React.FC = () => {
           <TextField
             fullWidth
             margin="normal"
-            label="Password"
-            name="password"
+            label="password"
+            name='password'
             type="password"
             value={formData.password}
             onChange={handleChange}
             required
+
           />
           <Box mt={2}>
-            <Button fullWidth type="submit" variant="contained" color="primary">
-              Register
+            <Button fullWidth type="submit" variant="contained" color="primary" disabled={loading}>
+              {loading ? 'Registering...' : 'Register'}
             </Button>
           </Box>
         </form>
@@ -106,3 +91,5 @@ const Register: React.FC = () => {
 };
 
 export default Register;
+
+
